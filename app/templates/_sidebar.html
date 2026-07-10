@@ -1,0 +1,23 @@
+<div class="p-3 d-flex flex-column h-100">
+    <a href="{{ url_for('main.dashboard') }}" class="d-flex align-items-center text-white text-decoration-none mb-4 px-2">
+        <img src="{{ session.get('logo_url') or url_for('static', filename='img/logo.png') }}" alt="Logo" class="me-2" style="width: 32px; height: 32px; border-radius: 8px;">
+        <span class="fs-5 fw-bold tracking-tight text-truncate">{{ session.get('firm_name', 'CA Invoice') }}</span>
+    </a>
+
+    <div class="ca-nav-group">Menu</div>
+    <a href="{{ url_for('main.dashboard') }}" class="ca-nav-item {% if request.endpoint == 'main.dashboard' %}active{% endif %}">
+        <i class="bi bi-grid"></i> Dashboard
+    </a>
+    <a href="{{ url_for('main.invoices') }}" class="ca-nav-item {% if 'invoices' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-receipt"></i> Invoices
+    </a>
+    <a href="{{ url_for('main.clients') }}" class="ca-nav-item {% if 'clients' in request.endpoint %}active{% endif %}">
+        <i class="bi bi-people"></i> Clients
+    </a>
+    
+    <div class="mt-auto">
+        <a href="{{ url_for('main.settings') }}" class="ca-nav-item {% if request.endpoint == 'main.settings' %}active{% endif %}">
+            <i class="bi bi-gear"></i> Settings
+        </a>
+    </div>
+</div>

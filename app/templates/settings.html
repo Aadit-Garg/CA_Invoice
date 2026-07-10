@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Settings — CA Invoice{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">Settings</h3>
+        <p class="text-muted small mb-0">Configure your firm and billing details</p>
+    </div>
+</div>
+
+<form method="POST">
+    <div class="row g-4">
+        <!-- Firm Details -->
+        <div class="col-md-6">
+            <div class="ca-card border-0 shadow-sm bg-white p-4 h-100">
+                <h5 class="fw-bold mb-4 border-bottom pb-2">Firm Details</h5>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Firm Name</label>
+                    <input type="text" name="firm_name" class="form-control bg-light" value="{{ setting.firm_name or '' }}">
+                </div>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Firm Address</label>
+                    <textarea name="firm_address" rows="3" class="form-control bg-light">{{ setting.firm_address or '' }}</textarea>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">GSTIN</label>
+                        <input type="text" name="gstin" class="form-control bg-light text-uppercase" value="{{ setting.gstin or '' }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">PAN</label>
+                        <input type="text" name="pan" class="form-control bg-light text-uppercase" value="{{ setting.pan or '' }}">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">Email</label>
+                        <input type="email" name="email" class="form-control bg-light" value="{{ setting.email or '' }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">Phone</label>
+                        <input type="text" name="phone" class="form-control bg-light" value="{{ setting.phone or '' }}">
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Bank & Terms -->
+        <div class="col-md-6">
+            <div class="ca-card border-0 shadow-sm bg-white p-4 h-100">
+                <h5 class="fw-bold mb-4 border-bottom pb-2">Bank Details</h5>
+                
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Account Name</label>
+                    <input type="text" name="bank_account_name" class="form-control bg-light" value="{{ setting.bank_account_name or '' }}">
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">Bank Name</label>
+                        <input type="text" name="bank_name" class="form-control bg-light" value="{{ setting.bank_name or '' }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">Account Number</label>
+                        <input type="text" name="account_number" class="form-control bg-light" value="{{ setting.account_number or '' }}">
+                    </div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">IFSC Code</label>
+                        <input type="text" name="ifsc_code" class="form-control bg-light text-uppercase" value="{{ setting.ifsc_code or '' }}">
+                    </div>
+                    <div class="col-6">
+                        <label class="form-label fw-semibold">Branch</label>
+                        <input type="text" name="branch" class="form-control bg-light" value="{{ setting.branch or '' }}">
+                    </div>
+                </div>
+                
+                <h5 class="fw-bold mb-3 border-bottom pb-2">Invoice Terms</h5>
+                <div>
+                    <label class="form-label fw-semibold">Default Terms & Notes</label>
+                    <textarea name="default_notes" rows="3" class="form-control bg-light">{{ setting.default_notes or '' }}</textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-end">
+        <button type="submit" class="btn btn-primary px-5 py-2 fw-semibold shadow-sm">
+            <i class="bi bi-save me-2"></i>Save Settings
+        </button>
+    </div>
+</form>
+{% endblock %}

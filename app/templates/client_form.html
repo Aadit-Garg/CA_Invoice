@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if client else 'Add' }} Client — CA Invoice{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h3 class="fw-bold mb-0">{{ 'Edit' if client else 'Add New' }} Client</h3>
+        <p class="text-muted small mb-0">Enter the client's billing details</p>
+    </div>
+    <a href="{{ url_for('main.clients') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to Clients
+    </a>
+</div>
+
+<div class="ca-card border-0 shadow-sm bg-white p-4 max-w-2xl mx-auto" style="max-width: 800px;">
+    <form method="POST">
+        <div class="row g-4">
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Company/Client Name *</label>
+                <input type="text" name="name" class="form-control bg-light" required value="{{ client.name if client else '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">Email Address</label>
+                <input type="email" name="email" class="form-control bg-light" value="{{ client.email if client else '' }}">
+            </div>
+            
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">GSTIN</label>
+                <input type="text" name="gstin" class="form-control bg-light text-uppercase" placeholder="e.g. 07AAAAA0000A1Z5" value="{{ client.gstin if client else '' }}">
+            </div>
+            <div class="col-md-6">
+                <label class="form-label fw-semibold">PAN</label>
+                <input type="text" name="pan" class="form-control bg-light text-uppercase" placeholder="e.g. ABCDE1234F" value="{{ client.pan if client else '' }}">
+            </div>
+
+            <div class="col-12">
+                <label class="form-label fw-semibold">Billing Address *</label>
+                <textarea name="address" rows="3" class="form-control bg-light" required>{{ client.address if client else '' }}</textarea>
+            </div>
+        </div>
+
+        <hr class="my-4">
+        <div class="d-flex justify-content-end gap-2">
+            <a href="{{ url_for('main.clients') }}" class="btn btn-light">Cancel</a>
+            <button type="submit" class="btn btn-primary px-4">Save Client</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

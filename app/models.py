@@ -21,6 +21,20 @@ class Invoice(db.Model):
     due_date = db.Column(db.Date)
     status = db.Column(db.String(20), default='Draft') # Draft, Pending, Paid, Overdue
     
+    # Client Snapshot
+    client_name = db.Column(db.String(150))
+    client_address = db.Column(db.Text)
+    client_gstin = db.Column(db.String(50))
+    client_pan = db.Column(db.String(50))
+    
+    # Firm Settings Overrides (if null, fall back to global settings)
+    firm_name = db.Column(db.String(150))
+    firm_address = db.Column(db.Text)
+    bank_account_name = db.Column(db.String(150))
+    bank_name = db.Column(db.String(150))
+    account_number = db.Column(db.String(50))
+    ifsc_code = db.Column(db.String(20))
+    
     # Tax configuration
     tax_type = db.Column(db.String(10), default='IGST') # 'IGST' or 'CGST_SGST'
     igst_rate = db.Column(db.Float, default=18.0)

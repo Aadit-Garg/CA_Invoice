@@ -33,40 +33,37 @@
 
     <div class="invoice-box mt-4">
         <!-- Header -->
+        <!-- Header info -->
         <div class="row mb-5 border-bottom pb-4 border-2 border-dark">
             <div class="col-6">
                 <!-- User requested image top left -->
                 <img src="{{ session.get('logo_url') or url_for('static', filename='img/logo.png') }}" alt="Logo" style="max-height: 80px; margin-bottom: 1rem;">
-                <h4 class="fw-bold mb-1" style="color: #1a365d;">{{ session.get('firm_name') or (setting.firm_name if setting else 'Firm Name') }}</h4>
-                <p class="mb-1">{{ setting.firm_address if setting else 'Firm Address' }}</p>
+                <h4 class="fw-bold mb-1" style="color: #1a365d;">{{ invoice.firm_name or session.get('firm_name') or (setting.firm_name if setting else 'Firm Name') }}</h4>
+                <p class="mb-1">{{ invoice.firm_address or (setting.firm_address if setting else 'Firm Address') }}</p>
                 {% if setting and setting.gstin %}
                 <p class="mb-0"><strong>GSTIN:</strong> {{ setting.gstin }}</p>
                 {% endif %}
-                {% if setting and setting.pan %}
-                <p class="mb-0"><strong>PAN:</strong> {{ setting.pan }}</p>
-                {% endif %}
             </div>
             <div class="col-6 text-end">
-                <h2 class="fw-bold text-uppercase mb-3" style="color: #1a365d; letter-spacing: 2px;">Tax Invoice</h2>
-                <h5 class="fw-bold mb-1">#{{ invoice.invoice_number }}</h5>
-                <p class="mb-1">Date: {{ invoice.issue_date.strftime('%B %d, %Y') }}</p>
-                {% if invoice.due_date %}
-                <p class="mb-1">Due Date: {{ invoice.due_date.strftime('%B %d, %Y') }}</p>
-                {% endif %}
+                <h2 class="fw-bold mb-3" style="color: #1a365d;">INVOICE</h2>
+                <div class="d-inline-block text-start">
+                    <p class="mb-1"><strong>Invoice No:</strong> <span class="fs-5">{{ invoice.invoice_number }}</span></p>
+                    <p class="mb-1"><strong>Issue Date:</strong> {{ invoice.issue_date.strftime('%d %b %Y') }}</p>
+                    {% if invoice.due_date %}
+                    <p class="mb-1"><strong>Due Date:</strong> {{ invoice.due_date.strftime('%d %b %Y') }}</p>
+                    {% endif %}
+                </div>
             </div>
         </div>
 
-        <!-- Bill To -->
-        <div class="row mb-5">
-            <div class="col-6">
-                <h6 class="text-uppercase fw-bold small mb-2 text-muted">Billed To:</h6>
-                <h5 class="fw-bold mb-1">{{ invoice.client.name }}</h5>
-                <p class="mb-1" style="white-space: pre-wrap;">{{ invoice.client.address }}</p>
-                {% if invoice.client.gstin %}
-                <p class="mb-0"><strong>GSTIN:</strong> {{ invoice.client.gstin }}</p>
-                {% endif %}
-                {% if invoice.client.pan %}
-                <p class="mb-0"><strong>PAN:</strong> {{ invoice.client.pan }}</p>
+        <!-- Billing info -->
+        <div class="row mb-5 bg-light p-4 rounded mx-0">
+            <div class="col-12">
+                <h6 class="text-uppercase fw-bold text-muted mb-3" style="letter-spacing: 1px;">Bill To:</h6>
+                <h5 class="fw-bold mb-2">{{ invoice.client_name or (invoice.client.name if invoice.client else 'Unknown Client') }}</h5>
+                <p class="mb-1">{{ invoice.client_address or (invoice.client.address if invoice.client else '') }}</p>
+                {% if invoice.client_gstin or (invoice.client and invoice.client.gstin) %}
+                <p class="mb-0 mt-2"><strong>GSTIN:</strong> {{ invoice.client_gstin or invoice.client.gstin }}</p>
                 {% endif %}
             </div>
         </div>
@@ -131,10 +128,10 @@
             {% if setting and setting.account_number %}
             <div class="col-6">
                 <h6 class="text-uppercase fw-bold small mb-2" style="color: #1a365d;">Payment Details</h6>
-                <p class="small mb-1"><strong>Account Name:</strong> {{ setting.bank_account_name }}</p>
-                <p class="small mb-1"><strong>Bank:</strong> {{ setting.bank_name }}</p>
-                <p class="small mb-1"><strong>A/C No:</strong> {{ setting.account_number }}</p>
-                <p class="small mb-1"><strong>IFSC:</strong> {{ setting.ifsc_code }}</p>
+                <p class="small mb-1"><strong>Account Name:</strong> {{ invoice.bank_account_name or setting.bank_account_name }}</p>
+                <p class="small mb-1"><strong>Bank:</strong> {{ invoice.bank_name or setting.bank_name }}</p>
+                <p class="small mb-1"><strong>A/C No:</strong> {{ invoice.account_number or setting.account_number }}</p>
+                <p class="small mb-1"><strong>IFSC:</strong> {{ invoice.ifsc_code or setting.ifsc_code }}</p>
             </div>
             {% endif %}
             

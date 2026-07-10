@@ -22,39 +22,30 @@
     <div class="row mb-5 border-bottom pb-4">
         <div class="col-sm-6">
             <img src="{{ session.get('logo_url') or url_for('static', filename='img/logo.png') }}" alt="Logo" style="max-height: 80px; margin-bottom: 1rem;">
-            <h4 class="fw-bold text-dark">{{ session.get('firm_name') or (setting.firm_name if setting else 'Firm Name') }}</h4>
-            <p class="text-muted small mb-1">{{ setting.firm_address if setting else 'Firm Address' }}</p>
+            <h4 class="fw-bold text-dark">{{ invoice.firm_name or session.get('firm_name') or (setting.firm_name if setting else 'Firm Name') }}</h4>
+            <p class="text-muted mb-1">{{ invoice.firm_address or (setting.firm_address if setting else 'Firm Address') }}</p>
             {% if setting and setting.gstin %}
             <p class="text-muted small mb-0"><strong>GSTIN:</strong> {{ setting.gstin }}</p>
             {% endif %}
-            {% if setting and setting.pan %}
-            <p class="text-muted small mb-0"><strong>PAN:</strong> {{ setting.pan }}</p>
-            {% endif %}
         </div>
-        <div class="col-sm-6 text-sm-end mt-4 mt-sm-0">
-            <h2 class="fw-bold text-uppercase text-secondary mb-3" style="letter-spacing: 2px;">Invoice</h2>
-            <h5 class="fw-bold text-dark mb-1">#{{ invoice.invoice_number }}</h5>
-            <p class="text-muted small mb-1">Date: {{ invoice.issue_date.strftime('%B %d, %Y') }}</p>
+        <div class="col-sm-6 text-end">
+            <h3 class="fw-bold text-dark mb-3">INVOICE</h3>
+            <p class="mb-1 text-muted"><strong>Invoice No:</strong> <span class="text-dark">{{ invoice.invoice_number }}</span></p>
+            <p class="mb-1 text-muted"><strong>Issue Date:</strong> <span class="text-dark">{{ invoice.issue_date.strftime('%d %b %Y') }}</span></p>
             {% if invoice.due_date %}
-            <p class="text-muted small mb-1">Due Date: {{ invoice.due_date.strftime('%B %d, %Y') }}</p>
+            <p class="mb-1 text-muted"><strong>Due Date:</strong> <span class="text-dark">{{ invoice.due_date.strftime('%d %b %Y') }}</span></p>
             {% endif %}
-            <span class="badge bg-{{ 'success' if invoice.status == 'Paid' else 'warning text-dark' if invoice.status == 'Pending' else 'secondary' }} mt-2 px-3 py-2">
-                Status: {{ invoice.status }}
-            </span>
         </div>
     </div>
 
     <!-- Client Info -->
-    <div class="row mb-5">
-        <div class="col-sm-6">
-            <h6 class="text-uppercase text-muted fw-bold small mb-3 border-bottom pb-2">Bill To:</h6>
-            <h5 class="fw-bold text-dark mb-1">{{ invoice.client.name }}</h5>
-            <p class="text-muted small mb-1" style="white-space: pre-wrap;">{{ invoice.client.address }}</p>
-            {% if invoice.client.gstin %}
-            <p class="text-muted small mb-0"><strong>GSTIN:</strong> {{ invoice.client.gstin }}</p>
-            {% endif %}
-            {% if invoice.client.pan %}
-            <p class="text-muted small mb-0"><strong>PAN:</strong> {{ invoice.client.pan }}</p>
+    <div class="row mb-5 bg-light p-4 rounded mx-0">
+        <div class="col-sm-12">
+            <h6 class="text-uppercase fw-bold text-muted mb-3" style="letter-spacing: 1px;">Bill To:</h6>
+            <h5 class="fw-bold mb-2">{{ invoice.client_name or (invoice.client.name if invoice.client else 'Unknown Client') }}</h5>
+            <p class="text-muted mb-1">{{ invoice.client_address or (invoice.client.address if invoice.client else '') }}</p>
+            {% if invoice.client_gstin or (invoice.client and invoice.client.gstin) %}
+            <p class="text-muted small mb-0 mt-2"><strong>GSTIN:</strong> {{ invoice.client_gstin or invoice.client.gstin }}</p>
             {% endif %}
         </div>
     </div>
@@ -117,11 +108,10 @@
         {% if setting and setting.account_number %}
         <div class="col-md-6 mb-4 mb-md-0">
             <h6 class="text-uppercase text-muted fw-bold small mb-2 border-bottom pb-2">Bank Details</h6>
-            <p class="small mb-1"><strong>Account Name:</strong> {{ setting.bank_account_name }}</p>
-            <p class="small mb-1"><strong>Bank:</strong> {{ setting.bank_name }}</p>
-            <p class="small mb-1"><strong>A/C No:</strong> {{ setting.account_number }}</p>
-            <p class="small mb-1"><strong>IFSC:</strong> {{ setting.ifsc_code }}</p>
-            <p class="small mb-0"><strong>Branch:</strong> {{ setting.branch }}</p>
+            <p class="small mb-1"><strong>Account Name:</strong> {{ invoice.bank_account_name or setting.bank_account_name }}</p>
+            <p class="small mb-1"><strong>Bank:</strong> {{ invoice.bank_name or setting.bank_name }}</p>
+            <p class="small mb-1"><strong>A/C No:</strong> {{ invoice.account_number or setting.account_number }}</p>
+            <p class="small mb-1"><strong>IFSC:</strong> {{ invoice.ifsc_code or setting.ifsc_code }}</p>
         </div>
         {% endif %}
         

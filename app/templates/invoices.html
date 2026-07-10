@@ -32,7 +32,7 @@
                 {% for inv in invoices %}
                 <tr>
                     <td class="fw-medium">{{ inv.invoice_number }}</td>
-                    <td>{{ inv.client.name }}</td>
+                    <td>{{ inv.client_name or (inv.client.name if inv.client else 'Unknown Client') }}</td>
                     <td>{{ inv.issue_date.strftime('%b %d, %Y') }}</td>
                     <td>{{ inv.due_date.strftime('%b %d, %Y') if inv.due_date else '-' }}</td>
                     <td>
@@ -42,9 +42,31 @@
                     </td>
                     <td class="fw-semibold">₹{{ "%.2f"|format(inv.total_amount) }}</td>
                     <td class="text-end">
-                        <a href="{{ url_for('main.view_invoice', id=inv.id) }}" class="btn btn-sm btn-outline-primary py-1 px-2" title="View/Print">
-                            <i class="bi bi-eye"></i> View
-                        </a>
+                        <div class="dropdown">
+                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle py-1 px-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm">
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.view_invoice', id=inv.id) }}">
+                                        <i class="bi bi-eye text-primary me-2"></i> View/Print
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ url_for('main.edit_invoice', id=inv.id) }}">
+                                        <i class="bi bi-pencil text-secondary me-2"></i> Edit
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ url_for('main.delete_invoice', id=inv.id) }}" onsubmit="return confirm('Are you sure you want to delete this invoice?');" style="display: inline;">
+                                        <button type="submit" class="dropdown-item text-danger">
+                                            <i class="bi bi-trash me-2"></i> Delete
+                                        </button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
                     </td>
                 </tr>
                 {% else %}

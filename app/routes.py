@@ -136,7 +136,17 @@ def new_invoice():
             issue_date=issue_date,
             due_date=due_date,
             tax_type=tax_type,
-            notes=notes
+            notes=notes,
+            client_name=request.form.get('client_name'),
+            client_address=request.form.get('client_address'),
+            client_gstin=request.form.get('client_gstin'),
+            client_pan=request.form.get('client_pan'),
+            firm_name=request.form.get('firm_name_override') or None,
+            firm_address=request.form.get('firm_address_override') or None,
+            bank_account_name=request.form.get('bank_account_name_override') or None,
+            bank_name=request.form.get('bank_name_override') or None,
+            account_number=request.form.get('account_number_override') or None,
+            ifsc_code=request.form.get('ifsc_code_override') or None
         )
         db.session.add(invoice)
         db.session.flush() # get invoice ID
@@ -191,3 +201,73 @@ def print_invoice(id):
     invoice = Invoice.query.get_or_404(id)
     setting = Settings.query.first()
     return render_template('invoice_print.html', invoice=invoice, setting=setting)
+@main_bp.route('/invoices/<int:id>/edit', methods=['GET', 'POST'])
+def edit_invoice(id):
+    invoice = Invoice.query.get_or_404(id)
+    if request.method == 'POST':
+        invoice.invoice_number = request.form.get('invoice_number')
+        invoice.issue_date = datetime.strptime(request.form.get('issue_date'), '%Y-%m-%d').date()
+        due_date_str = request.form.get('due_date')
+        invoice.due_date = datetime.strptime(due_date_str, '%Y-%m-%d').date() if due_date_str else None
+        invoice.tax_type = request.form.get('tax_type')
+        invoice.notes = request.form.get('notes')
+        
+        # Update client snapshot if changed
+        new_client_id = request.form.get('client_id')
+        if new_client_id and str(new_client_id) != str(invoice.client_id):
+            invoice.client_id = new_client_id
+            invoice.client_name = request.form.get('client_name')
+            invoice.client_address = request.form.get('client_address')
+            invoice.client_gstin = request.form.get('client_gstin')
+            invoice.client_pan = request.form.get('client_pan')
+            
+        # Overrides
+        invoice.firm_name = request.form.get('firm_name_override') or None
+        invoice.firm_address = request.form.get('firm_address_override') or None
+        invoice.bank_account_name = request.form.get('bank_account_name_override') or None
+        invoice.bank_name = request.form.get('bank_name_override') or None
+        invoice.account_number = request.form.get('account_number_override') or None
+        invoice.ifsc_code = request.form.get('ifsc_code_override') or None
+        
+        # Recreate items
+        InvoiceItem.query.filter_by(invoice_id=invoice.id).delete()
+        descriptions = request.form.getlist('description[]')
+        sac_codes = request.form.getlist('sac_code[]')
+        amounts = request.form.getlist('amount[]')
+        
+        for i in range(len(descriptions)):
+            if descriptions[i].strip() and amounts[i].strip():
+                item = InvoiceItem(
+                    invoice_id=invoice.id,
+                    description=descriptions[i],
+                    sac_code=sac_codes[i],
+                    amount=float(amounts[i])
+                )
+                db.session.add(item)
+                
+        db.session.commit()
+        flash('Invoice updated successfully', 'success')
+        return redirect(url_for('main.view_invoice', id=invoice.id))
+
+    # Fetch clients
+    clients = []
+    if session.get('api_url') and session.get('api_key'):
+        try:
+            resp = requests.get(session['api_url'], params={'api_key': session['api_key']}, timeout=5)
+            if resp.status_code == 200:
+                clients = resp.json().get('clients', [])
+        except:
+            clients = [{'id': c.id, 'name': c.name, 'gstin': c.gstin} for c in Client.query.all()]
+    else:
+        clients = [{'id': c.id, 'name': c.name, 'gstin': c.gstin} for c in Client.query.all()]
+        
+    setting = Settings.query.first()
+    return render_template('invoice_form.html', invoice=invoice, clients=clients, setting=setting)
+
+@main_bp.route('/invoices/<int:id>/delete', methods=['POST'])
+def delete_invoice(id):
+    invoice = Invoice.query.get_or_404(id)
+    db.session.delete(invoice)
+    db.session.commit()
+    flash('Invoice deleted successfully.', 'success')
+    return redirect(url_for('main.invoices'))
